@@ -1,0 +1,51 @@
+# open library (raster)
+#open setwd:
+setwd ("C:/Users/Nico/Desktop/prova")
+s #9bands #0,05m resolution
+> s
+class      : RasterBrick 
+dimensions : 8095, 8193, 66322335, 9  (nrow, ncol, ncell, nlayers)
+resolution : 0.05, 0.05  (x, y)
+extent     : 608695.9, 609105.5, 4844874, 4845279  (xmin, xmax, ymin, ymax)
+crs        : +proj=utm +zone=32 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
+source     : C:/Users/Nico/Desktop/prova/Campo_1_Agosto.tif 
+names      : Campo_1_Agosto.1, Campo_1_Agosto.2, Campo_1_Agosto.3, Campo_1_Agosto.4, Campo_1_Agosto.5, Campo_1_Agosto.6, Campo_1_Agosto.7, Campo_1_Agosto.8, Campo_1_Agosto.9 
+min values :                0,                0,                0,                0,                0,                0,                0,                0,                0 
+max values :              255,              255,              255,              255,              255,              255,              255,              255,              255 
+
+## Image information and some statistic
+nlayers (s)
+9
+#coordinate system
+> crs (s)
+CRS arguments:
+ +proj=utm +zone=32 +datum=WGS84 +units=m +no_defs +ellps=WGS84
++towgs84=0,0,0 
+#dimension
+ dim(s)
+[1] 8095 8193    9
+
+## Visualize multi-band image
+plotRGB(s, r = 4, g = 3, b = 2, axes = TRUE, stretch = "lin", main = "Sentinel True Color")
+
+## Rename spectral bands
+> names (s)  
+[1] "Campo_1_Agosto.1" "Campo_1_Agosto.2" "Campo_1_Agosto.3" "Campo_1_Agosto.4"
+[5] "Campo_1_Agosto.5" "Campo_1_Agosto.6" "Campo_1_Agosto.7" "Campo_1_Agosto.8"
+[9] "Campo_1_Agosto.9"
+
+> names (s) <- c ('violet', 'blue', 'green', 'red', 'red edge 1', 'red edge 2', 'nir 1', 'nir 2', 'nir 3')
+> names (s)
+[1] "violet"     "blue"       "green"      "red"        "red.edge.1"
+[6] "red.edge.2" "nir.1"      "nir.2"      "nir.3"     
+
+## Calculate NDVI
+> band7 =raster (s, layer=7)
+> band4 =raster (s, layer=4)
+> NDVI = (band7-band4)/(band7+band4)
+> plot (NDVI)
+
+## thresholding to mask pixels with <0.4 NDVI value
+veg <- calc(ndvi, function(x){x[x < 0.4] <- NA; return(x)})
+plot (veg, main= '> 0.4')
+
